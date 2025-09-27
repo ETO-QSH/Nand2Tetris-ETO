@@ -59,13 +59,13 @@ def rotate(db, p, r):
     return True
 
 
-def clear_lines(db, p):
+def clear_lines(db, lines):
+    for r in lines:
+        for rr in range(r, 0, -1):
+            set_row16(db, rr, get_row16(db, rr - 1))
+        set_row16(db, 0, 0)
+
+
+def find_full_rows(db, p):
     rows = {y for _, y in cells(p)}
-    cleared = 0
-    for r in sorted(rows):
-        if get_row16(db, r) == 0x3FF:
-            for rr in range(r, 0, -1):
-                set_row16(db, rr, get_row16(db, rr - 1))
-            set_row16(db, 0, 0)
-            cleared += 1
-    return cleared
+    return [r for r in sorted(rows) if get_row16(db, r) == 0x3FF]
