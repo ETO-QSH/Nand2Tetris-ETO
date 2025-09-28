@@ -10,14 +10,15 @@ from activate import activate_register, block_type
 
 WIDTH, HEIGHT = 500, 676
 
-database = [
+ROM = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 5, 72, 0, 0, 97, 127
+    0, 0, 0, 0, 0, 0, 97, 127
 ]
 
+database = ROM[::]
 activate = activate_register(database)
 activate_map = [[1 if (x, y) in activate else -1 for x in range(125)] for y in range(169)]
 
@@ -27,14 +28,12 @@ draw = lambda: screen.blit(pygame.transform.scale(current, (WIDTH, HEIGHT)), (0,
 pil_image = overlie("title", activate_map)
 title = pil_to_pygame(pil_image)
 
-temp = list(range(40))
-catch = [0, 0, 0, 0]
 state = "title"
 current = title
 title_mode = 0
 pause = False
+over = True
 frame = 60
-choice = 0
 tick = 1
 
 
@@ -46,22 +45,33 @@ def update_current(database, main="title"):
 
 
 def update():
-    global database, tick, choice, catch, state
+    global database, tick, choice, catch, state, over, temp
 
     if not pause:
         tick += 1
     elif pause:
         tick = 0
 
+    if state == "title" and over:
+        temp = list(range(40))
+        catch = [0, 0, 0, 0]
+        database = ROM[::]
+        state = "title"
+        over = False
+        choice = 0
+        update_current(database)
+
     if state == "over":
         update_current(database, "game")
-        if tick % 5 == 0:
+        if tick % 3 == 0:
             if temp:
                 database[temp.pop()] = 255
                 database[temp.pop()] = 255
             else:
                 if database[40] * 256 + database[41] > database[42] * 256 + database[43]:
                     database[42], database[43] = database[40], database[41]
+                    ROM[42], ROM[43] = database[40], database[41]
+                over = True
 
     if state == "game":
         update_current(database, "game")
@@ -100,7 +110,7 @@ def update():
 
 
 def on_key_down(key):
-    global current, title_mode, state, choice, pause, database
+    global title_mode, state, choice, pause, database, temp, over
     print(f"Pressed key: {key.name}")
 
     if state == "title":
@@ -154,6 +164,11 @@ def on_key_down(key):
                 elif pause:
                     database[46] -= 64
                 pause = not pause
+
+    elif state == "over":
+        if key == keys.RETURN and over:
+            state = "title"
+            print('ok')
 
 
 pgzrun.go()
