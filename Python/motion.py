@@ -1,6 +1,17 @@
 from activate import tetromino
 
 
+def rpng_random(seed):
+    temp1 = seed >> 1
+    temp2 = seed ^ temp1
+    temp3 = temp2 << 1
+    temp4 = temp2 ^ temp3
+    temp5 = temp4 >> 2
+    seed = temp4 ^ temp5
+    result = seed % 7
+    return result, seed
+
+
 def get_row16(db, row):
     hi, lo = db[row * 2], db[row * 2 + 1]
     return (hi << 8) | lo

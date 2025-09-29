@@ -5,7 +5,7 @@ from PIL import Image
 
 from motion import *
 from overlie import overlie
-from activate import activate_register, block_type
+from activate import activate_register, tetromino
 
 
 WIDTH, HEIGHT = 500, 676
@@ -28,6 +28,7 @@ draw = lambda: screen.blit(pygame.transform.scale(current, (WIDTH, HEIGHT)), (0,
 pil_image = overlie("title", activate_map)
 title = pil_to_pygame(pil_image)
 
+seed = random.randint(0, 256)
 state = "title"
 current = title
 title_mode = 0
@@ -45,7 +46,7 @@ def update_current(database, main="title"):
 
 
 def update():
-    global database, tick, choice, catch, state, over, temp
+    global database, tick, choice, catch, state, over, temp, seed
 
     if not pause:
         tick += 1
@@ -77,7 +78,8 @@ def update():
         update_current(database, "game")
         if not database[44]:
             if not choice:
-                choice = random.choice(list(block_type.values()))
+                res, seed = rpng_random(seed)
+                choice = list(tetromino.keys())[res]
             database[44] = choice
             choice = 0
 
@@ -168,7 +170,6 @@ def on_key_down(key):
     elif state == "over":
         if key == keys.RETURN and over:
             state = "title"
-            print('ok')
 
 
 pgzrun.go()

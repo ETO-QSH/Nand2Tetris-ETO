@@ -98,5 +98,4 @@ for key, matrix in Dict.items():
 
     result_dict[key] = relative_coords
 
-# for key, value in result_dict.items():
-#     print(f"{key}: {value}")
+print(result_dict)
